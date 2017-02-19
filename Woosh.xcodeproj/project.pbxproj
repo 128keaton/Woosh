@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		8AE5F5C61E5951D4004709F0 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AE5F5C51E5951D4004709F0 /* AppDelegate.swift */; };
 		8AE5F5C81E5951D4004709F0 /* GlanceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AE5F5C71E5951D4004709F0 /* GlanceViewController.swift */; };
-		8AE5F5CA1E5951D4004709F0 /* MapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AE5F5C91E5951D4004709F0 /* MapViewController.swift */; };
+		8AE5F5CA1E5951D4004709F0 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AE5F5C91E5951D4004709F0 /* SettingsViewController.swift */; };
 		8AE5F5CD1E5951D4004709F0 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8AE5F5CB1E5951D4004709F0 /* Main.storyboard */; };
 		8AE5F5CF1E5951D4004709F0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8AE5F5CE1E5951D4004709F0 /* Assets.xcassets */; };
 		8AE5F5D21E5951D4004709F0 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8AE5F5D01E5951D4004709F0 /* LaunchScreen.storyboard */; };
@@ -39,7 +39,7 @@
 		8AE5F5C21E5951D4004709F0 /* Woosh.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Woosh.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8AE5F5C51E5951D4004709F0 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		8AE5F5C71E5951D4004709F0 /* GlanceViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlanceViewController.swift; sourceTree = "<group>"; };
-		8AE5F5C91E5951D4004709F0 /* MapViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapViewController.swift; sourceTree = "<group>"; };
+		8AE5F5C91E5951D4004709F0 /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
 		8AE5F5CC1E5951D4004709F0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		8AE5F5CE1E5951D4004709F0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		8AE5F5D11E5951D4004709F0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -105,7 +105,7 @@
 			children = (
 				8AE5F5C51E5951D4004709F0 /* AppDelegate.swift */,
 				8AE5F5C71E5951D4004709F0 /* GlanceViewController.swift */,
-				8AE5F5C91E5951D4004709F0 /* MapViewController.swift */,
+				8AE5F5C91E5951D4004709F0 /* SettingsViewController.swift */,
 				8AE5F5CB1E5951D4004709F0 /* Main.storyboard */,
 				8AE5F5CE1E5951D4004709F0 /* Assets.xcassets */,
 				8AE5F5D01E5951D4004709F0 /* LaunchScreen.storyboard */,
@@ -277,7 +277,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8AE5F5CA1E5951D4004709F0 /* MapViewController.swift in Sources */,
+				8AE5F5CA1E5951D4004709F0 /* SettingsViewController.swift in Sources */,
 				8AE5F5C61E5951D4004709F0 /* AppDelegate.swift in Sources */,
 				8AE5F5C81E5951D4004709F0 /* GlanceViewController.swift in Sources */,
 			);

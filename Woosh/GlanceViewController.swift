@@ -24,10 +24,19 @@ class GlanceViewController: UIViewController, CLLocationManagerDelegate, MKMapVi
     override func viewDidLoad() {
         super.viewDidLoad()
         mapView.delegate = self
-        overlayView.layer.cornerRadius = 20
-        overlayView.layer.masksToBounds = true
-
+        self.setupOverlayView()
         self.initLocationManager()
+    }
+
+    func setupOverlayView() {
+
+
+
+        overlayView.backgroundColor = UIColor.white
+        overlayView.layer.cornerRadius = 20
+        overlayView.clipsToBounds = true
+
+
     }
 
 
@@ -91,7 +100,7 @@ class GlanceViewController: UIViewController, CLLocationManagerDelegate, MKMapVi
             return MKOverlayRenderer.init()
         }
     }
-    func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView?{
+    func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
         if annotation is MKUserLocation {
             //return nil so map view draws "blue dot" for standard user location
             return nil
@@ -103,8 +112,8 @@ class GlanceViewController: UIViewController, CLLocationManagerDelegate, MKMapVi
         pinView?.canShowCallout = true
         let smallSquare = CGSize(width: 30, height: 30)
         let button = UIButton(frame: CGRect(origin: CGPoint.zero, size: smallSquare))
-    //    button.setBackgroundImage(UIImage(named: "car"), for: .normal)
-        button.titleLabel?.text = "Call Airport"
+        button.setBackgroundImage(UIImage(named: "phone"), for: .normal)
+
 
         button.addTarget(self, action: #selector(callAirport(_:)), for: .touchUpInside)
         pinView?.leftCalloutAccessoryView = button
@@ -127,8 +136,43 @@ class GlanceViewController: UIViewController, CLLocationManagerDelegate, MKMapVi
         }
     }
 
-    func callAirport(_ sender: UIButton){
-        print(sender.superview?.superview?.superview)
+    func callAirport(_ sender: UIButton) {
+        //oh my god, kill me
+        guard let pinView = sender.superview?.superview?.superview?.superview?.superview?.superview?.superview?.superview
+            else {
+            return
+        }
+        let actualAirPin = pinView as! MKPinAnnotationView
+        let annotation = actualAirPin.annotation
+        let request = MKLocalSearchRequest()
+        request.naturalLanguageQuery = (annotation?.title)!
+        request.region = MKCoordinateRegion(center: (annotation?.coordinate)!, span: MKCoordinateSpanMake(0.001, 0.001))
+        let actualSearch = MKLocalSearch(request: request)
+
+        actualSearch.start { response, _ in
+
+            guard let response = response else {
+                return
+            }
+
+            let callAlert = UIAlertController(title: "Do you want to call \(response.mapItems.first!.name!)?", message: "This will direct you to the Phone app.", preferredStyle: UIAlertControllerStyle.actionSheet)
+            let callAction = UIAlertAction(title: "Yes", style: .default, handler: { _ in
+                if let url = NSURL(string: "tel://\(response.mapItems.first?.phoneNumber)"), UIApplication.shared.canOpenURL(url as URL) {
+                    UIApplication.shared.open(url as URL, options: [:], completionHandler: nil)
+                }
+            })
+            let dismissAction = UIAlertAction(title: "No", style: .destructive, handler: { _ in
+                self.dismiss(animated: true, completion: nil)
+            })
+            callAlert.addAction(callAction)
+            callAlert.addAction(dismissAction)
+            
+            self.present(callAlert, animated: true, completion: nil)
+            
+
+        }
+
+
     }
 
     // MARK: CLLocationManagerDelegate
@@ -203,4 +247,13 @@ protocol HandleMapSearch {
 }
 
 
+extension UIView {
+    func roundCornersWithLayerMask(cornerRadii: CGFloat, corners: UIRectCorner) {
+        let path = UIBezierPath(roundedRect: bounds,
+                                byRoundingCorners: corners,
+                                cornerRadii: CGSize(width: cornerRadii, height: cornerRadii))
+        let maskLayer = CAShapeLayer()
+        maskLayer.path = path.cgPath
 
+        layer.mask = maskLayer
+    } }
