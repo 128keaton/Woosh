@@ -209,7 +209,7 @@
 					8AE5F5C11E5951D3004709F0 = {
 						CreatedOnToolsVersion = 8.2.1;
 						DevelopmentTeam = Z48RKT6B3T;
-						ProvisioningStyle = Automatic;
+						ProvisioningStyle = Manual;
 					};
 					8AE5F5D71E5951D4004709F0 = {
 						CreatedOnToolsVersion = 8.2.1;
@@ -437,6 +437,8 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.128keaton.Woosh;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "5f134f95-56eb-4112-b4e8-2a794360c1d0";
+				PROVISIONING_PROFILE_SPECIFIER = "Woosh - Development";
 				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
@@ -445,12 +447,15 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				DEVELOPMENT_TEAM = Z48RKT6B3T;
 				INFOPLIST_FILE = Woosh/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.128keaton.Woosh;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "17f98a2e-5e62-42a1-b949-474b9d773b99";
+				PROVISIONING_PROFILE_SPECIFIER = "Woosh - Distribution";
 				SWIFT_VERSION = 3.0;
 			};
 			name = Release;

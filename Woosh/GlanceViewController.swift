@@ -16,6 +16,7 @@ class GlanceViewController: UIViewController, CLLocationManagerDelegate, MKMapVi
     public var recentLocations: [CLLocation]?
     private let fauxRadius = 0.01449275362
     private var selectedAirport: MKPlacemark? = nil
+    
     @IBOutlet var mapView: MKMapView!
     @IBOutlet var overlayView: UIView!
     @IBOutlet var statusLabel: UILabel!
@@ -29,14 +30,9 @@ class GlanceViewController: UIViewController, CLLocationManagerDelegate, MKMapVi
     }
 
     func setupOverlayView() {
-
-
-
         overlayView.backgroundColor = UIColor.white
         overlayView.layer.cornerRadius = 20
         overlayView.clipsToBounds = true
-
-
     }
 
 
@@ -102,9 +98,9 @@ class GlanceViewController: UIViewController, CLLocationManagerDelegate, MKMapVi
     }
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
         if annotation is MKUserLocation {
-            //return nil so map view draws "blue dot" for standard user location
             return nil
         }
+        
         let reuseId = "pin"
         var pinView = mapView.dequeueReusableAnnotationView(withIdentifier: reuseId) as? MKPinAnnotationView
         pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: reuseId)
