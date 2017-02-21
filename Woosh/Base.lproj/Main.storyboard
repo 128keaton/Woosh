@@ -85,11 +85,30 @@
                         <outlet property="mapView" destination="Iv8-Vh-J2N" id="Bxs-qh-wor"/>
                         <outlet property="overlayView" destination="dRB-pA-oBk" id="7BT-3m-GJX"/>
                         <outlet property="statusLabel" destination="Vbx-0i-uVt" id="Imq-fV-xX1"/>
+                        <segue destination="IoA-Bv-RdV" kind="show" identifier="toInfo" id="moQ-wR-3zk"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="W5J-7L-Pyd" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="749.60000000000002" y="-320.68965517241384"/>
+        </scene>
+        <!--Air Info View Controller-->
+        <scene sceneID="tJw-vj-yZe">
+            <objects>
+                <viewController id="IoA-Bv-RdV" customClass="AirInfoViewController" customModule="Woosh" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="wlq-R0-mkL"/>
+                        <viewControllerLayoutGuide type="bottom" id="TnV-3e-GKe"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="O7e-Vg-AKp">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="GpA-Gf-BsT" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1572" y="97"/>
         </scene>
         <!--Settings View Controller-->
         <scene sceneID="he5-jP-8wQ">
@@ -136,7 +155,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Yoe-Fa-cgF" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1493.5999999999999" y="-321.58920539730138"/>
+            <point key="canvasLocation" x="1566" y="-582"/>
         </scene>
     </scenes>
     <resources>

@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		18B19670EFFE86FEF9E40821 /* Pods_WooshUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C6A2760949C20F6511163AA9 /* Pods_WooshUITests.framework */; };
+		8AA35A451E5C233A00DA9B3C /* AirInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AA35A441E5C233A00DA9B3C /* AirInfoViewController.swift */; };
 		8AB7C6DB1E5BE54B00BB07BF /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8AB7C6DA1E5BE54B00BB07BF /* GoogleService-Info.plist */; };
 		8AE5F5C61E5951D4004709F0 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AE5F5C51E5951D4004709F0 /* AppDelegate.swift */; };
 		8AE5F5C81E5951D4004709F0 /* GlanceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AE5F5C71E5951D4004709F0 /* GlanceViewController.swift */; };
@@ -46,6 +47,7 @@
 		31D06DE6F15128E00CA7AA13 /* Pods-WooshTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-WooshTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-WooshTests/Pods-WooshTests.debug.xcconfig"; sourceTree = "<group>"; };
 		345BE04673B3C4CDBEA72CA4 /* Pods_Woosh.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Woosh.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		449AB56FD54D9EC0860C4B76 /* Pods-WooshUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-WooshUITests.release.xcconfig"; path = "Pods/Target Support Files/Pods-WooshUITests/Pods-WooshUITests.release.xcconfig"; sourceTree = "<group>"; };
+		8AA35A441E5C233A00DA9B3C /* AirInfoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AirInfoViewController.swift; sourceTree = "<group>"; };
 		8AB7C6DA1E5BE54B00BB07BF /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		8AE5F5C21E5951D4004709F0 /* Woosh.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Woosh.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8AE5F5C51E5951D4004709F0 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -138,6 +140,7 @@
 			children = (
 				8AE5F5C51E5951D4004709F0 /* AppDelegate.swift */,
 				8AE5F5C71E5951D4004709F0 /* GlanceViewController.swift */,
+				8AA35A441E5C233A00DA9B3C /* AirInfoViewController.swift */,
 				8AE5F5C91E5951D4004709F0 /* SettingsViewController.swift */,
 				8AE784A01E5A9F52009BBE10 /* FullLoadingScreen.swift */,
 				8AE5F5CB1E5951D4004709F0 /* Main.storyboard */,
@@ -467,6 +470,7 @@
 				8AE5F5C61E5951D4004709F0 /* AppDelegate.swift in Sources */,
 				8AE5F5C81E5951D4004709F0 /* GlanceViewController.swift in Sources */,
 				8AE784A11E5A9F52009BBE10 /* FullLoadingScreen.swift in Sources */,
+				8AA35A451E5C233A00DA9B3C /* AirInfoViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

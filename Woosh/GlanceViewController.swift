@@ -20,6 +20,10 @@ class GlanceViewController: UIViewController, CLLocationManagerDelegate, MKMapVi
     private let fauxRange: Double = 0.6
     private var selectedAirport: MKPlacemark? = nil
     private var loadingScreen: FullLoadingScreen? = FullLoadingScreen()
+
+    var swipe: UISwipeGestureRecognizer? = nil
+    var selectedAirportIdent: String? = nil
+
     var ref: FIRDatabaseReference!
     var airportTooClose: MKMapItem? = nil
 
@@ -28,42 +32,96 @@ class GlanceViewController: UIViewController, CLLocationManagerDelegate, MKMapVi
     @IBOutlet var statusLabel: UILabel!
     @IBOutlet var detailLabel: UILabel!
 
+
+    // MARK: Superclass Methods
+
     override func viewDidLoad() {
         super.viewDidLoad()
         // Setup the default Firebase reference.
         ref = FIRDatabase.database().reference()
+        self.mapView.userTrackingMode = .follow
         mapView.delegate = self
         loadingScreen?.addToView(view: self.view)
         self.setupOverlayView()
+
         self.initLocationManager()
+
+        swipe = UISwipeGestureRecognizer(target: self, action: #selector(GlanceViewController.toggleHelperView))
+        swipe?.direction = .up
+        overlayView.addGestureRecognizer(swipe!)
+
+
     }
 
-    func testQuery(coordinate: CLLocationCoordinate2D, callback: @escaping ((_ data: [MKMapItem]) -> Void)) {
-        print(coordinate)
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
+    }
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "toInfo" {
+            let dest = segue.destination as! AirInfoViewController
+            dest.selectedAirportIdent = self.selectedAirportIdent
+            self.selectedAirportIdent = nil
+        }
+    }
+
+    // MARK: Helper Methods
+
+
+    func toggleHelperView() {
+        let collapsedFrame = CGRect(x: overlayView.frame.origin.x, y: overlayView.frame.origin.y, width: overlayView.bounds.width, height: overlayView.bounds.height - 45)
+        let fullFrame = CGRect(x: overlayView.frame.origin.x, y: overlayView.frame.origin.y, width: overlayView.bounds.width, height: overlayView.bounds.height + 45)
+        //good ol haptic
+        let generator = UIImpactFeedbackGenerator(style: .light)
+        if swipe?.direction == .up {
+            swipe?.direction = .down
+            UIView.beginAnimations(nil, context: nil)
+            UIView.setAnimationDuration(0.05)
+            UIView.setAnimationCurve(.linear)
+            overlayView.frame = collapsedFrame
+            generator.prepare()
+            UIView.commitAnimations()
+            generator.impactOccurred()
+        } else {
+            swipe?.direction = .up
+            UIView.beginAnimations(nil, context: nil)
+            UIView.setAnimationDuration(0.05)
+            UIView.setAnimationCurve(.linear)
+            overlayView.frame = fullFrame
+            generator.prepare()
+            UIView.commitAnimations()
+            generator.impactOccurred()
+
+        }
+    }
+    func airportQuery(coordinate: CLLocationCoordinate2D, callback: @escaping ((_ data: [MKMapItem]) -> Void)) {
         let query = self.ref.child("airports").queryOrdered(byChild: "latitude_deg").queryStarting(atValue: "\(coordinate.latitude - fauxRange)").queryEnding(atValue: "\(coordinate.latitude + fauxRange)")
         var testObjects: [MKMapItem] = []
         query.observe(.value, with: { (snapshot) in
-            print(snapshot)
+
             for airport in snapshot.children {
                 let childSnapshot = snapshot.childSnapshot(forPath: (airport as AnyObject).key).value as! [String: AnyObject]
                 let longitude = Double(childSnapshot["longitude_deg"] as! String)
                 if (coordinate.longitude - self.fauxRange ... coordinate.longitude + self.fauxRange).contains(longitude!) {
                     let placemark = MKPlacemark(coordinate: CLLocationCoordinate2D(latitude: Double(childSnapshot["latitude_deg"] as! String)!, longitude: Double(childSnapshot["longitude_deg"] as! String)!))
+
                     let mapObject = MKMapItem(placemark: placemark)
                     mapObject.name = childSnapshot["name"]! as? String
+
                     testObjects.append(mapObject)
                 }
             }
             callback(testObjects)
         })
     }
+
     func setupOverlayView() {
         overlayView.backgroundColor = UIColor.white
         overlayView.layer.cornerRadius = 20
         overlayView.clipsToBounds = true
     }
-    func processAirports(airports: [MKMapItem]) {
 
+    func processAirports(airports: [MKMapItem]) {
         if airports.count != 0 {
             for airport in airports {
                 let locationOfAirport = CLLocation(latitude: (airport.placemark.coordinate.latitude), longitude: (airport.placemark.coordinate.longitude))
@@ -94,43 +152,19 @@ class GlanceViewController: UIViewController, CLLocationManagerDelegate, MKMapVi
         }
     }
 
-    func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
-        if overlay is MKCircle {
-            let circle = MKCircleRenderer(overlay: overlay)
-            circle.strokeColor = UIColor.red
-            circle.fillColor = UIColor(red: 255, green: 0, blue: 0, alpha: 0.1)
-            circle.lineWidth = 1
-            return circle
-        } else {
-            return MKOverlayRenderer.init()
-        }
-    }
-    func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
-        if annotation is MKUserLocation {
-            return nil
-        }
-        let reuseId = "pin"
-        var pinView = mapView.dequeueReusableAnnotationView(withIdentifier: reuseId) as? MKPinAnnotationView
-        pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: reuseId)
-        pinView?.pinTintColor = UIColor.orange
-        pinView?.canShowCallout = true
-        let smallSquare = CGSize(width: 30, height: 30)
-        let button = UIButton(frame: CGRect(origin: CGPoint.zero, size: smallSquare))
-        button.setBackgroundImage(UIImage(named: "phone"), for: .normal)
-        button.addTarget(self, action: #selector(callAirport(_:)), for: .touchUpInside)
-        pinView?.leftCalloutAccessoryView = button
-        return pinView
-    }
 
     func addRadiusCircle(location: CLLocation) {
         self.mapView.delegate = self
         let circle = MKCircle(center: location.coordinate, radius: 8046.72 as CLLocationDistance)
         self.mapView.add(circle)
     }
-    func updateRegionFromLocation(location: CLLocation) {
-        let region = MKCoordinateRegion(center: location.coordinate, span: MKCoordinateSpanMake(fauxRadius, fauxRadius))
-        mapView.setRegion(region, animated: true)
+
+    func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
+        selectedAirportIdent = (view.annotation?.title)!
+        print(view.annotation?.title)
+        
     }
+
     func callAirport(_ sender: UIButton) {
         //oh my god, kill me
         guard let pinView = sender.superview?.superview?.superview?.superview?.superview?.superview?.superview?.superview
@@ -140,6 +174,8 @@ class GlanceViewController: UIViewController, CLLocationManagerDelegate, MKMapVi
         let actualAirPin = pinView as! MKPinAnnotationView
         let annotation = actualAirPin.annotation
         let request = MKLocalSearchRequest()
+
+
         request.naturalLanguageQuery = (annotation?.title)!
         request.region = MKCoordinateRegion(center: (annotation?.coordinate)!, span: MKCoordinateSpanMake(0.001, 0.001))
         let actualSearch = MKLocalSearch(request: request)
@@ -170,6 +206,7 @@ class GlanceViewController: UIViewController, CLLocationManagerDelegate, MKMapVi
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
         locationManager.requestWhenInUseAuthorization()
         locationManager.requestLocation()
+
     }
     private func locationManager(manager: CLLocationManager, didChangeAuthorizationStatus status: CLAuthorizationStatus) {
         if status == .authorizedWhenInUse {
@@ -190,9 +227,7 @@ class GlanceViewController: UIViewController, CLLocationManagerDelegate, MKMapVi
                 self.mapView.setRegion(region, animated: true)
                 DispatchQueue.main.async {
                     NotificationCenter.default.post(name: self.notificationName, object: locations.last)
-                    self.updateRegionFromLocation(location: locations.last!)
-
-                    self.testQuery(coordinate: locations.last!.coordinate, callback: { (data: [MKMapItem]) in
+                    self.airportQuery(coordinate: locations.last!.coordinate, callback: { (data: [MKMapItem]) in
                         print(data.count)
                         self.processAirports(airports: data)
 
@@ -204,10 +239,49 @@ class GlanceViewController: UIViewController, CLLocationManagerDelegate, MKMapVi
         }
     }
 
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+    func toInfo(_ sender: UIButton) {
+        if self.selectedAirportIdent != nil {
+            performSegue(withIdentifier: "toInfo", sender: sender)
+        }
+
     }
+
+    //MARK: MKMapViewDelegate
+
+    func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
+        if overlay is MKCircle {
+            let circle = MKCircleRenderer(overlay: overlay)
+            circle.strokeColor = UIColor.red
+            circle.fillColor = UIColor(red: 255, green: 0, blue: 0, alpha: 0.1)
+            circle.lineWidth = 1
+            return circle
+        } else {
+            return MKOverlayRenderer.init()
+        }
+    }
+    func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
+        if annotation is MKUserLocation {
+            return nil
+        }
+        let reuseId = "pin"
+        var pinView = mapView.dequeueReusableAnnotationView(withIdentifier: reuseId) as? MKPinAnnotationView
+        pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: reuseId)
+        pinView?.pinTintColor = UIColor.orange
+        pinView?.canShowCallout = true
+        let smallSquare = CGSize(width: 30, height: 30)
+        let button = UIButton.init(type: .infoDark)
+        button.frame = CGRect(origin: CGPoint.zero, size: smallSquare)
+        button.addTarget(self, action: #selector(GlanceViewController.toInfo(_:)), for: .touchUpInside)
+        pinView?.leftCalloutAccessoryView = button
+        return pinView
+    }
+
+
+    func mapView(_ mapView: MKMapView, didUpdate userLocation: MKUserLocation) {
+       // mapView.centerCoordinate = (userLocation.location?.coordinate)!
+    }
+
+
 
 
 }
