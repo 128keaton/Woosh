@@ -38,14 +38,16 @@ class GlanceViewController: UIViewController, CLLocationManagerDelegate, MKMapVi
     override func viewDidLoad() {
         super.viewDidLoad()
         // Setup the default Firebase reference.
+        FIRDatabase.database().persistenceEnabled = true
         ref = FIRDatabase.database().reference()
+       
         self.mapView.userTrackingMode = .follow
         mapView.delegate = self
         loadingScreen?.addToView(view: self.view)
         self.setupOverlayView()
 
         self.initLocationManager()
-
+        self.setNeedsStatusBarAppearanceUpdate()
         swipe = UISwipeGestureRecognizer(target: self, action: #selector(GlanceViewController.toggleHelperView))
         swipe?.direction = .up
         overlayView.addGestureRecognizer(swipe!)
@@ -59,7 +61,7 @@ class GlanceViewController: UIViewController, CLLocationManagerDelegate, MKMapVi
     }
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "toInfo" {
-            let dest = segue.destination as! AirInfoViewController
+            let dest = segue.destination.childViewControllers[0] as! AirInfoViewController
             dest.selectedAirportIdent = self.selectedAirportIdent
             self.selectedAirportIdent = nil
         }
@@ -161,8 +163,9 @@ class GlanceViewController: UIViewController, CLLocationManagerDelegate, MKMapVi
 
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
         selectedAirportIdent = (view.annotation?.title)!
-        print(view.annotation?.title)
-        
+    }
+    override var preferredStatusBarStyle: UIStatusBarStyle{
+        return UIStatusBarStyle.default
     }
 
     func callAirport(_ sender: UIButton) {
@@ -278,7 +281,7 @@ class GlanceViewController: UIViewController, CLLocationManagerDelegate, MKMapVi
 
 
     func mapView(_ mapView: MKMapView, didUpdate userLocation: MKUserLocation) {
-       // mapView.centerCoordinate = (userLocation.location?.coordinate)!
+        // mapView.centerCoordinate = (userLocation.location?.coordinate)!
     }
 
 
