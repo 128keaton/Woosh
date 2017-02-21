@@ -6,6 +6,7 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11757"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -42,11 +43,23 @@
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="infoDark" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="xxn-sI-eMm">
+                                        <rect key="frame" x="345" y="149" width="22" height="22"/>
+                                        <color key="tintColor" white="0.0" alpha="0.81824933980000003" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <state key="normal">
+                                            <color key="titleColor" white="0.0" alpha="0.81824933980000003" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        </state>
+                                        <connections>
+                                            <segue destination="SVs-l5-cGK" kind="presentation" modalTransitionStyle="flipHorizontal" id="8fD-jf-jrq"/>
+                                        </connections>
+                                    </button>
                                 </subviews>
                                 <color key="backgroundColor" red="0.98958333330000003" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
+                                    <constraint firstItem="xxn-sI-eMm" firstAttribute="trailing" secondItem="dRB-pA-oBk" secondAttribute="trailingMargin" id="HaB-o2-YfL"/>
                                     <constraint firstItem="ZL4-5s-SHN" firstAttribute="centerX" secondItem="Vbx-0i-uVt" secondAttribute="centerX" id="Twc-WV-QQt"/>
                                     <constraint firstItem="ZL4-5s-SHN" firstAttribute="leading" secondItem="dRB-pA-oBk" secondAttribute="leading" constant="17" id="ZKM-49-KJZ"/>
+                                    <constraint firstItem="xxn-sI-eMm" firstAttribute="bottom" secondItem="dRB-pA-oBk" secondAttribute="bottomMargin" id="dTP-CU-SQx"/>
                                     <constraint firstItem="Vbx-0i-uVt" firstAttribute="centerY" secondItem="dRB-pA-oBk" secondAttribute="centerY" id="fM8-EN-ggI"/>
                                     <constraint firstAttribute="height" constant="179" id="o4T-2f-Eh1"/>
                                     <constraint firstItem="ZL4-5s-SHN" firstAttribute="top" secondItem="Vbx-0i-uVt" secondAttribute="bottom" constant="8" symbolic="YES" id="x1M-Ln-9yZ"/>
@@ -77,6 +90,53 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="W5J-7L-Pyd" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="749.60000000000002" y="-320.68965517241384"/>
+        </scene>
+        <!--Settings View Controller-->
+        <scene sceneID="he5-jP-8wQ">
+            <objects>
+                <viewController id="SVs-l5-cGK" customClass="SettingsViewController" customModule="Woosh" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="0q5-MK-TVC"/>
+                        <viewControllerLayoutGuide type="bottom" id="9EZ-EL-4rM"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="JOP-oM-vKm">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Udb-8N-8Oo">
+                                <rect key="frame" x="169" y="617" width="37" height="30"/>
+                                <state key="normal" title="Done"/>
+                            </button>
+                            <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="a3X-ja-bQY">
+                                <rect key="frame" x="47" y="319" width="281" height="29"/>
+                                <segments>
+                                    <segment title="Standard"/>
+                                    <segment title="Satellite"/>
+                                    <segment title="Hybrid"/>
+                                </segments>
+                            </segmentedControl>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Map Type:" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="rLU-s7-N8e">
+                                <rect key="frame" x="147" y="290" width="80" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstAttribute="bottom" secondItem="Udb-8N-8Oo" secondAttribute="bottom" constant="20" symbolic="YES" id="2lS-ex-i76"/>
+                            <constraint firstItem="a3X-ja-bQY" firstAttribute="centerX" secondItem="JOP-oM-vKm" secondAttribute="centerX" id="47e-vE-As3"/>
+                            <constraint firstItem="a3X-ja-bQY" firstAttribute="top" secondItem="rLU-s7-N8e" secondAttribute="bottom" constant="8" symbolic="YES" id="4SE-JF-BW2"/>
+                            <constraint firstItem="rLU-s7-N8e" firstAttribute="centerX" secondItem="JOP-oM-vKm" secondAttribute="centerX" id="9Fs-AZ-hWD"/>
+                            <constraint firstItem="a3X-ja-bQY" firstAttribute="leading" secondItem="JOP-oM-vKm" secondAttribute="leadingMargin" constant="31" id="Onr-GM-KRH"/>
+                            <constraint firstItem="a3X-ja-bQY" firstAttribute="centerX" secondItem="Udb-8N-8Oo" secondAttribute="centerX" id="biw-cQ-tvK"/>
+                            <constraint firstItem="a3X-ja-bQY" firstAttribute="centerY" secondItem="JOP-oM-vKm" secondAttribute="centerY" id="nKt-7r-Kec"/>
+                        </constraints>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Yoe-Fa-cgF" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1493.5999999999999" y="-321.58920539730138"/>
         </scene>
     </scenes>
     <resources>

@@ -9,14 +9,20 @@
 import UIKit
 import MapKit
 import QuartzCore
+import Firebase
+
 class GlanceViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDelegate {
 
     public let locationManager = CLLocationManager()
     private let notificationName = Notification.Name("updateRegion")
     public var recentLocations: [CLLocation]?
     private let fauxRadius = 0.01449275362
+    private let fauxRange: Double = 0.6
     private var selectedAirport: MKPlacemark? = nil
-    
+    private var loadingScreen: FullLoadingScreen? = FullLoadingScreen()
+    var ref: FIRDatabaseReference!
+    var airportTooClose: MKMapItem? = nil
+
     @IBOutlet var mapView: MKMapView!
     @IBOutlet var overlayView: UIView!
     @IBOutlet var statusLabel: UILabel!
@@ -24,65 +30,68 @@ class GlanceViewController: UIViewController, CLLocationManagerDelegate, MKMapVi
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        // Setup the default Firebase reference.
+        ref = FIRDatabase.database().reference()
         mapView.delegate = self
+        loadingScreen?.addToView(view: self.view)
         self.setupOverlayView()
         self.initLocationManager()
     }
 
+    func testQuery(coordinate: CLLocationCoordinate2D, callback: @escaping ((_ data: [MKMapItem]) -> Void)) {
+        print(coordinate)
+        let query = self.ref.child("airports").queryOrdered(byChild: "latitude_deg").queryStarting(atValue: "\(coordinate.latitude - fauxRange)").queryEnding(atValue: "\(coordinate.latitude + fauxRange)")
+        var testObjects: [MKMapItem] = []
+        query.observe(.value, with: { (snapshot) in
+            print(snapshot)
+            for airport in snapshot.children {
+                let childSnapshot = snapshot.childSnapshot(forPath: (airport as AnyObject).key).value as! [String: AnyObject]
+                let longitude = Double(childSnapshot["longitude_deg"] as! String)
+                if (coordinate.longitude - self.fauxRange ... coordinate.longitude + self.fauxRange).contains(longitude!) {
+                    let placemark = MKPlacemark(coordinate: CLLocationCoordinate2D(latitude: Double(childSnapshot["latitude_deg"] as! String)!, longitude: Double(childSnapshot["longitude_deg"] as! String)!))
+                    let mapObject = MKMapItem(placemark: placemark)
+                    mapObject.name = childSnapshot["name"]! as? String
+                    testObjects.append(mapObject)
+                }
+            }
+            callback(testObjects)
+        })
+    }
     func setupOverlayView() {
         overlayView.backgroundColor = UIColor.white
         overlayView.layer.cornerRadius = 20
         overlayView.clipsToBounds = true
     }
-
-
-    // MARK: Airport location logic
-
-    func searchForAirports(coordinate: CLLocationCoordinate2D) {
-        let request = MKLocalSearchRequest()
-        request.naturalLanguageQuery = "Airport"
-        request.region = MKCoordinateRegion(center: coordinate, span: MKCoordinateSpanMake(fauxRadius, fauxRadius))
-        let actualSearch = MKLocalSearch(request: request)
-
-        actualSearch.start { response, _ in
-
-            guard let response = response else {
-                return
-            }
-            self.processAirports(airports: response.mapItems)
-
-        }
-
-
-    }
     func processAirports(airports: [MKMapItem]) {
-        var airportTooClose: MKMapItem? = nil
+
         if airports.count != 0 {
             for airport in airports {
-                let locationOfAirport = CLLocation(latitude: airport.placemark.coordinate.latitude, longitude: airport.placemark.coordinate.longitude)
+                let locationOfAirport = CLLocation(latitude: (airport.placemark.coordinate.latitude), longitude: (airport.placemark.coordinate.longitude))
                 self.addRadiusCircle(location: locationOfAirport)
-                self.dropPinAt(placemark: airport.placemark)
+                self.dropPinAt(placemark: (airport.placemark))
                 let distance = (locationOfAirport.distance(from: (recentLocations?.last)!)) / 1609.344
                 if distance <= 5.0 {
-                    airportTooClose = airport
-                    print(airport.name! + " is too close!")
-
-
+                    self.airportTooClose = airport
+                    print((airport.name!) + " is too close!")
                 }
             }
-
+            //hide loading screen now
+            if self.loadingScreen?.isVisible == true {
+                loadingScreen?.removeFromView()
+            }
         } else {
             print("No airports found")
         }
-        if airportTooClose != nil {
+        let generator = UINotificationFeedbackGenerator()
+        if self.airportTooClose != nil {
             self.detailLabel.text = (airportTooClose?.name!)! + " is too close!"
             self.statusLabel.text = "No"
+            generator.notificationOccurred(.error)
         } else {
             self.statusLabel.text = "Yes"
             self.detailLabel.text = "You can fly"
+            generator.notificationOccurred(.success)
         }
-
-
     }
 
     func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
@@ -100,7 +109,6 @@ class GlanceViewController: UIViewController, CLLocationManagerDelegate, MKMapVi
         if annotation is MKUserLocation {
             return nil
         }
-        
         let reuseId = "pin"
         var pinView = mapView.dequeueReusableAnnotationView(withIdentifier: reuseId) as? MKPinAnnotationView
         pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: reuseId)
@@ -109,8 +117,6 @@ class GlanceViewController: UIViewController, CLLocationManagerDelegate, MKMapVi
         let smallSquare = CGSize(width: 30, height: 30)
         let button = UIButton(frame: CGRect(origin: CGPoint.zero, size: smallSquare))
         button.setBackgroundImage(UIImage(named: "phone"), for: .normal)
-
-
         button.addTarget(self, action: #selector(callAirport(_:)), for: .touchUpInside)
         pinView?.leftCalloutAccessoryView = button
         return pinView
@@ -125,13 +131,6 @@ class GlanceViewController: UIViewController, CLLocationManagerDelegate, MKMapVi
         let region = MKCoordinateRegion(center: location.coordinate, span: MKCoordinateSpanMake(fauxRadius, fauxRadius))
         mapView.setRegion(region, animated: true)
     }
-
-    override func viewDidAppear(_ animated: Bool) {
-        if self.recentLocations?.first != nil {
-            print(self.searchForAirports(coordinate: (self.recentLocations?.first?.coordinate)!))
-        }
-    }
-
     func callAirport(_ sender: UIButton) {
         //oh my god, kill me
         guard let pinView = sender.superview?.superview?.superview?.superview?.superview?.superview?.superview?.superview
@@ -146,25 +145,18 @@ class GlanceViewController: UIViewController, CLLocationManagerDelegate, MKMapVi
         let actualSearch = MKLocalSearch(request: request)
 
         actualSearch.start { response, _ in
-
             guard let response = response else {
                 return
             }
-
-            let callAlert = UIAlertController(title: "Do you want to call \(response.mapItems.first!.name!)?", message: "This will direct you to the Phone app.", preferredStyle: UIAlertControllerStyle.actionSheet)
-            let callAction = UIAlertAction(title: "Yes", style: .default, handler: { _ in
-                if let url = NSURL(string: "tel://\(response.mapItems.first?.phoneNumber)"), UIApplication.shared.canOpenURL(url as URL) {
+            // find a phone number for the airport
+            if response.mapItems.first!.phoneNumber != nil {
+                let number = response.mapItems.first!.phoneNumber!.replacingOccurrences(of: "\\D", with: "", options: String.CompareOptions.regularExpression, range: response.mapItems.first!.phoneNumber!.startIndex..<response.mapItems.first!.phoneNumber!.endIndex)
+                if let url = NSURL(string: "telprompt://\(number)") {
                     UIApplication.shared.open(url as URL, options: [:], completionHandler: nil)
                 }
-            })
-            let dismissAction = UIAlertAction(title: "No", style: .destructive, handler: { _ in
-                self.dismiss(animated: true, completion: nil)
-            })
-            callAlert.addAction(callAction)
-            callAlert.addAction(dismissAction)
-            
-            self.present(callAlert, animated: true, completion: nil)
-            
+            } else {
+                print("No number *boop boop*")
+            }
 
         }
 
@@ -190,33 +182,28 @@ class GlanceViewController: UIViewController, CLLocationManagerDelegate, MKMapVi
     }
 
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        if locations.first != nil {
+        if let location = locations.first {
             DispatchQueue.global(qos: .background).async {
                 self.recentLocations = locations
-                print(self.recentLocations!)
-                // print("location:: \(locations)")
-
+                let span = MKCoordinateSpanMake(0.05, 0.05)
+                let region = MKCoordinateRegion(center: location.coordinate, span: span)
+                self.mapView.setRegion(region, animated: true)
                 DispatchQueue.main.async {
-
                     NotificationCenter.default.post(name: self.notificationName, object: locations.last)
                     self.updateRegionFromLocation(location: locations.last!)
-                    self.testForLocate()
+
+                    self.testQuery(coordinate: locations.last!.coordinate, callback: { (data: [MKMapItem]) in
+                        print(data.count)
+                        self.processAirports(airports: data)
+
+                    })
 
                 }
             }
 
-
-        }
-    }
-    func testForLocate() {
-        if self.recentLocations != nil {
-            self.searchForAirports(coordinate: (self.recentLocations?.first?.coordinate)!)
         }
     }
 
-    func mapViewDidFinishRenderingMap(_ mapView: MKMapView, fullyRendered: Bool) {
-
-    }
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
