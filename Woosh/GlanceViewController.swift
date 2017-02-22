@@ -31,7 +31,8 @@ class GlanceViewController: UIViewController, CLLocationManagerDelegate, MKMapVi
     @IBOutlet var overlayView: UIView!
     @IBOutlet var statusLabel: UILabel!
     @IBOutlet var detailLabel: UILabel!
-
+    @IBOutlet var grabberView: UIView!
+    
 
     // MARK: Superclass Methods
 
@@ -51,6 +52,14 @@ class GlanceViewController: UIViewController, CLLocationManagerDelegate, MKMapVi
         swipe = UISwipeGestureRecognizer(target: self, action: #selector(GlanceViewController.toggleHelperView))
         swipe?.direction = .up
         overlayView.addGestureRecognizer(swipe!)
+        
+        grabberView.layer.cornerRadius = 9
+        grabberView.clipsToBounds = true
+        
+        grabberView.layer.shadowColor = UIColor.black.cgColor
+        grabberView.layer.shadowOffset = CGSize(width: 10, height: 10)
+        grabberView.layer.shadowOpacity = 0.5
+        grabberView.layer.shadowRadius = 10
 
 
     }
@@ -69,6 +78,9 @@ class GlanceViewController: UIViewController, CLLocationManagerDelegate, MKMapVi
 
     // MARK: Helper Methods
 
+    @IBAction func goBackToUser(){
+        mapView.centerCoordinate = (self.recentLocations?.last?.coordinate)!
+    }
 
     func toggleHelperView() {
         let collapsedFrame = CGRect(x: overlayView.frame.origin.x, y: overlayView.frame.origin.y, width: overlayView.bounds.width, height: overlayView.bounds.height - 45)
@@ -104,9 +116,9 @@ class GlanceViewController: UIViewController, CLLocationManagerDelegate, MKMapVi
             for airport in snapshot.children {
                 let childSnapshot = snapshot.childSnapshot(forPath: (airport as AnyObject).key).value as! [String: AnyObject]
                 let longitude = Double(childSnapshot["longitude_deg"] as! String)
-                if (coordinate.longitude - self.fauxRange ... coordinate.longitude + self.fauxRange).contains(longitude!) {
+                if (coordinate.longitude - self.fauxRange ... coordinate.longitude + self.fauxRange).contains(longitude!) && "\(childSnapshot["type"]!)" != "small_airport" && "\(childSnapshot["type"]!)" != "closed" {
                     let placemark = MKPlacemark(coordinate: CLLocationCoordinate2D(latitude: Double(childSnapshot["latitude_deg"] as! String)!, longitude: Double(childSnapshot["longitude_deg"] as! String)!))
-
+                    
                     let mapObject = MKMapItem(placemark: placemark)
                     mapObject.name = childSnapshot["name"]! as? String
 

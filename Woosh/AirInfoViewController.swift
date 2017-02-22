@@ -72,7 +72,7 @@ class AirInfoViewController: UIViewController {
                 UIApplication.shared.open(url as URL, options: [:], completionHandler: nil)
             }
         } else {
-            let alert = UIAlertController(title: "Error", message: "No phone number found", preferredStyle: .alert)
+            let alert = UIAlertController(title: "Error", message: "No phone number on file", preferredStyle: .alert)
             let okayAction = UIAlertAction(title: "Okay", style: .default, handler: { (action) in
                 alert.dismiss(animated: true, completion: nil)
             })

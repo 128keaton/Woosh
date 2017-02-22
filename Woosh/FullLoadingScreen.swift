@@ -8,8 +8,9 @@
 
 import Foundation
 import UIKit
+import NVActivityIndicatorView
 class FullLoadingScreen: UIViewController {
-    fileprivate var spinner: UIActivityIndicatorView?
+    fileprivate var spinner: NVActivityIndicatorView?
     fileprivate var label: UILabel?
     fileprivate var blurView: UIVisualEffectView?
 
@@ -28,10 +29,11 @@ class FullLoadingScreen: UIViewController {
         label?.text = "Locating airports"
     }
     func setupSpinner() {
-        self.spinner = UIActivityIndicatorView(frame: self.view.frame)
-        let transform = CGAffineTransform(scaleX: 1.5, y: 1.5)
+        self.spinner = NVActivityIndicatorView(frame: self.view.frame)
+        self.spinner?.type = .ballScaleRippleMultiple
+        let transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
         self.spinner?.transform = transform
-        self.spinner?.color = UIColor.black
+        self.spinner?.color = self.view.tintColor
     }
     func setupBlurView() {
         let blurEffect = UIBlurEffect(style: .light)
